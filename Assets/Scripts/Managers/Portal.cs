@@ -1,79 +1,65 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections.Generic;
 using System.Collections;
 
 public class Portal : MonoBehaviour
 {
-    [SerializeField] private float speed = 5f;
-    [SerializeField] private float rotateSpeed = 50f;
-    private Vector3 newPosition;
+    [SerializeField] private float speed = 5f; 
+    [SerializeField] private float rotateSpeed = 50f; 
+    private Vector3 newPosition; 
 
     private void Start()
     {
-        SetRandomPosition();
+        ChangePosition();
     }
 
     private void Update()
     {
-        // Pindahkan posisi perlahan ke arah newPosition
-        if (transform.position != newPosition)
+        
+        if (GameObject.Find("Player").GetComponentInChildren<Weapon>() != null)
         {
-            transform.position = Vector3.MoveTowards(transform.position, newPosition, speed * Time.deltaTime);
+            GetComponent<Collider2D>().enabled = true;
+            GetComponent<SpriteRenderer>().enabled = true;
+        }
+        else
+        {
+            GetComponent<Collider2D>().enabled = false;
+            GetComponent<SpriteRenderer>().enabled = false;
         }
 
-        // Jika posisi telah hampir dicapai, set ulang newPosition
+        transform.Rotate(Vector3.forward, rotateSpeed * Time.deltaTime);
+        transform.position = Vector3.MoveTowards(transform.position, newPosition, speed * Time.deltaTime);
+
         if (Vector3.Distance(transform.position, newPosition) < 0.5f)
         {
-            SetRandomPosition();
+            ChangePosition();
         }
 
-        // Rotasi objek terus-menerus
-        RotatePortal();
-
-        // Periksa apakah Player memiliki weapon dan atur tampilan portal
-        UpdatePortalState(PlayerHasWeapon());
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+
+
         if (other.CompareTag("Player"))
         {
-            LevelManager levelManager = FindObjectOfType<LevelManager>();
-            if (levelManager != null)
+            foreach (Transform child in GameManager.Instance.transform)
+        {
+            if (child.GetComponent<Canvas>() != null || child.GetComponent<UnityEngine.UI.Image>() != null)
             {
-                levelManager.LoadScene("Main");
+                child.gameObject.SetActive(true);
             }
-            else
-            {
-                Debug.LogWarning("LevelManager not found in the scene.");
-            }
+        }
+            FindObjectOfType<LevelManager>().LoadScene("Main");
         }
     }
 
-    private void SetRandomPosition()
+    private void ChangePosition()
     {
         float randomX = Random.Range(-10f, 10f);
         float randomY = Random.Range(-10f, 10f);
-        newPosition = new Vector3(randomX, randomY, 0f);
+        newPosition = new Vector3(randomX, randomY);
     }
 
-    private void RotatePortal()
-    {
-        transform.Rotate(Vector3.forward, rotateSpeed * Time.deltaTime);
-    }
-
-    private bool PlayerHasWeapon()
-    {
-        GameObject player = GameObject.FindWithTag("Player");
-        return player != null && player.GetComponentInChildren<Weapon>() != null;
-    }
-
-    private void UpdatePortalState(bool isEnabled)
-    {
-        var spriteRenderer = GetComponent<SpriteRenderer>();
-        var collider = GetComponent<Collider2D>();
-
-        if (spriteRenderer != null) spriteRenderer.enabled = isEnabled;
-        if (collider != null) collider.enabled = isEnabled;
-    }
 }

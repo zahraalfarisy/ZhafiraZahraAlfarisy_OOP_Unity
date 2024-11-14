@@ -29,3 +29,4 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(GameObject.Find("Camera"));
     }
 }
+

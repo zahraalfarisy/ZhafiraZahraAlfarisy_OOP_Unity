@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using UnityEngine.SceneManagement; 
 using System.Collections;
 
 public class LevelManager : MonoBehaviour
@@ -16,14 +16,15 @@ public class LevelManager : MonoBehaviour
 
     public void LoadScene(string sceneName)
     {
-        animator.SetTrigger("StartTransition");
-        StartCoroutine(LoadSceneWithDelay(sceneName, 1f));
+        StartCoroutine(LoadSceneAsync(sceneName));
     }
 
-    private IEnumerator LoadSceneWithDelay(string sceneName, float delay)
+    private IEnumerator LoadSceneAsync(string sceneName)
     {
-        yield return new WaitForSeconds(delay);
-        SceneManager.LoadScene(sceneName);
+        //animator.SetTrigger("StartTransition");
+        yield return new WaitForSeconds(1f); 
         animator.SetTrigger("EndTransition");
+        SceneManager.LoadScene(sceneName);
+        
     }
 }
