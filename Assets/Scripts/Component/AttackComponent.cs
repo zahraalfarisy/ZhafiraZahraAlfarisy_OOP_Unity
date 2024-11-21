@@ -1,25 +1,30 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Collider))]
+[RequireComponent(typeof(Collider2D))]
 public class AttackComponent : MonoBehaviour
 {
-    public Bullet bullet;  // Bullet used for attacking
-    public int attackDamage; // Amount of damage dealt by this object
+    public Bullet bullet;
+    public int damage;
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        // Check if the collided object has a HitboxComponent
-        HitboxComponent targetHitbox = collision.GetComponent<HitboxComponent>();
+        if (other.gameObject.CompareTag(gameObject.tag)) return;
 
-        // If the collided object has a different tag and possesses a HitboxComponent
-        if (targetHitbox != null)
+        if (other.GetComponent<HitboxComponent>() != null)
         {
-            // Apply damage to the object using the bullet
-            targetHitbox.Damage(bullet);
+            HitboxComponent hitbox = other.GetComponent<HitboxComponent>();
 
-    
+            if (bullet != null)
+            {
+                hitbox.Damage(bullet.damage);
+            }
+
+            hitbox.Damage(damage);
+        }
+
+        if (other.GetComponent<InvincibilityComponent>() != null)
+        {
+            other.GetComponent<InvincibilityComponent>().TriggerInvincibility();
         }
     }
 }
