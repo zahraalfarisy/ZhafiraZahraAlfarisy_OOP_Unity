@@ -8,10 +8,7 @@ public class LevelManager : MonoBehaviour
 
     private void Awake()
     {
-        if (animator == null)
-        {
-            animator.enabled = false;
-        }
+        animator.enabled = false;
     }
 
     public void LoadScene(string sceneName)
@@ -21,10 +18,10 @@ public class LevelManager : MonoBehaviour
 
     private IEnumerator LoadSceneAsync(string sceneName)
     {
+        animator.enabled = true;
         //animator.SetTrigger("StartTransition");
         yield return new WaitForSeconds(1f); 
         animator.SetTrigger("EndTransition");
-        SceneManager.LoadScene(sceneName);
-        
+        AsyncOperation asyncOperation = SceneManager.LoadSceneAsync(sceneName);
     }
 }

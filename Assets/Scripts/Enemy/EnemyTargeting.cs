@@ -24,7 +24,7 @@ public class EnemyTargeting : Enemy
         }
 
         // Randomly spawn multiple enemies
-        GenerateMultipleEnemies(enemyTemplate, Random.Range(1, 6));
+       
     }
 
     private void Update()
@@ -48,22 +48,5 @@ public class EnemyTargeting : Enemy
     }
 
     // Method to spawn multiple enemies on the left or right side of the screen
-    public void GenerateMultipleEnemies(GameObject enemyTemplate, int quantity)
-    {
-        for (int i = 0; i < quantity; i++)
-        {
-            // Determine a random spawn position on either side of the screen
-            float posX = Random.Range(0, 2) == 0 ? -Screen.width / 110f : Screen.width / 110f;
-            float posY = Random.Range(-Screen.height / 80f, Screen.height / 80f);
-
-            // Instantiate a new instance of the EnemyTargeting prefab
-            GameObject newEnemyInstance = Instantiate(enemyTemplate, new Vector2(posX, posY), Quaternion.identity);
-            EnemyTargeting enemyBehavior = newEnemyInstance.GetComponent<EnemyTargeting>();
-
-            if (enemyBehavior != null)
-            {
-                enemyBehavior.targetPlayerTransform = targetPlayerTransform; // Set target to player
-            }
-        }
-    }
+    
 }

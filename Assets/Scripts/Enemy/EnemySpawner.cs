@@ -21,7 +21,7 @@ public class EnemySpawner : MonoBehaviour
 
     public CombatManager combatManager;
 
-    public bool isSpawning = true;
+    public bool isSpawning = false;
 
     void Update()
     {

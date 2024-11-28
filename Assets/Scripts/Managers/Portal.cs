@@ -1,65 +1,48 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using System.Collections.Generic;
-using System.Collections;
 
 public class Portal : MonoBehaviour
 {
-    [SerializeField] private float speed = 5f; 
-    [SerializeField] private float rotateSpeed = 50f; 
-    private Vector3 newPosition; 
+    [SerializeField] float speed = 0.15f;
+    [SerializeField] float rotateSpeed = 5.0f;
 
-    private void Start()
+    Vector2 newPosition;
+
+    void Start()
     {
         ChangePosition();
     }
 
-    private void Update()
+    void Update()
     {
-        
-        if (GameObject.Find("Player").GetComponentInChildren<Weapon>() != null)
+        if (Vector2.Distance(transform.position, newPosition) < 0.5f)
+            ChangePosition();
+
+
+        if (GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<Weapon>() != null)
         {
-            GetComponent<Collider2D>().enabled = true;
             GetComponent<SpriteRenderer>().enabled = true;
+            GetComponent<Collider2D>().enabled = true;
+            transform.position = Vector2.Lerp(transform.position, newPosition, speed * Time.deltaTime);
         }
         else
         {
-            GetComponent<Collider2D>().enabled = false;
             GetComponent<SpriteRenderer>().enabled = false;
+            GetComponent<Collider2D>().enabled = false;
         }
-
-        transform.Rotate(Vector3.forward, rotateSpeed * Time.deltaTime);
-        transform.position = Vector3.MoveTowards(transform.position, newPosition, speed * Time.deltaTime);
-
-        if (Vector3.Distance(transform.position, newPosition) < 0.5f)
-        {
-            ChangePosition();
-        }
-
+        transform.Rotate(0, 0, rotateSpeed * Time.deltaTime);
+        transform.position = Vector2.MoveTowards(transform.position, newPosition, speed * Time.deltaTime);
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
+    void OnTriggerEnter2D(Collider2D other)
     {
-
-
-        if (other.CompareTag("Player"))
+        if (other.gameObject.CompareTag("Player"))
         {
-            foreach (Transform child in GameManager.Instance.transform)
-        {
-            if (child.GetComponent<Canvas>() != null || child.GetComponent<UnityEngine.UI.Image>() != null)
-            {
-                child.gameObject.SetActive(true);
-            }
-        }
-            FindObjectOfType<LevelManager>().LoadScene("Main");
+            GameManager.Instance.LevelManager.LoadScene("Main");
         }
     }
 
-    private void ChangePosition()
+    void ChangePosition()
     {
-        float randomX = Random.Range(-10f, 10f);
-        float randomY = Random.Range(-10f, 10f);
-        newPosition = new Vector3(randomX, randomY);
+        newPosition = new Vector2(Random.Range(-7.5f, 7.5f), Random.Range(-7.5f, 7.5f));
     }
-
 }

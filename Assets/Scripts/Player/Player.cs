@@ -4,9 +4,22 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    public static Player Instance {get ; private set ; }
     private PlayerMovement playerMovement;
     private Animator animator;
 
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+    }
     void Start()
     {
         // Get the PlayerMovement component and store it in playerMovement

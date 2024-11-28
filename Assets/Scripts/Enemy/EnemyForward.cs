@@ -11,7 +11,7 @@ public class EnemyForward : Enemy
     {
         // Posisikan musuh secara acak di bagian atas layar
         RespawnAtTop();
-        EnemyForward.SpawnMultipleEnemies(enemyPrefab, Random.Range(3, 7));
+        
     }
 
     private void Update()
@@ -36,17 +36,5 @@ public class EnemyForward : Enemy
         transform.rotation = Quaternion.identity;
     }
 
-    public static void SpawnMultipleEnemies(GameObject enemyPrefab, int count)
-    {
-        for (int i = 0; i < count; i++)
-        {
-            // Buat instance baru dari prefab EnemyForward
-            GameObject newEnemy = Instantiate(enemyPrefab);
-            EnemyForward enemyScript = newEnemy.GetComponent<EnemyForward>();
-            if (enemyScript != null)
-            {
-                enemyScript.RespawnAtTop(); // Tentukan posisi spawn di bagian atas layar
-            }
-        }
-    }
+    
 }
