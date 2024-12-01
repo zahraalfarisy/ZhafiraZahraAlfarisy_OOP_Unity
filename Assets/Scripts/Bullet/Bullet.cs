@@ -1,54 +1,55 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Pool;
+using UnityEngine.Pool; 
 
 public class Bullet : MonoBehaviour
 {
     [Header("Bullet Stats")]
-    public float bulletSpeed = 20f;
-    public int damage = 10;
+    public float bulletSpeed = 20;
+    public int damage;
+    private Rigidbody2D rb;    
 
-    private Rigidbody2D rb;
-    private IObjectPool<Bullet> objectPool;
+    public IObjectPool<Bullet> ObjectPool { get; set; }
 
-    // Called by the pool to set the reference
-    public void SetPool(IObjectPool<Bullet> pool)
+    void Start()
     {
-        objectPool = pool;
-    }
-
-    // Called to reset the bullet's velocity and other properties
-    public void Initialize()
-    {
-        // Ensure Rigidbody2D is set
-        if (rb == null) rb = GetComponent<Rigidbody2D>();
+        rb = GetComponent<Rigidbody2D>();
         rb.velocity = transform.up * bulletSpeed;
-    }
-
-    private void ReturnToPool()
-    {
-        objectPool.Release(this);
-    }
-    
-    void OnTriggerEnter2D(Collider2D other)
-    {
-        // Check if bullet hits an enemy
-        if (other.CompareTag("Enemy"))
-        {
-            // Handle enemy damage logic here, e.g., other.GetComponent<Enemy>().TakeDamage(damage);
-
-            // Return the bullet to the pool after it hits an enemy
-            ReturnToPool();
-        }
     }
 
     void Update()
     {
-        // Return bullet to pool if it travels too far
-        if (transform.position.magnitude > 50) // Example distance limit
+    }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        // HitboxComponent hitbox = collision.gameObject.GetComponent<HitboxComponent>();
+        // if (hitbox != null)
+        // {
+        //     hitbox.Damage(damage);
+        // }
+
+        ObjectPool.Release(this);
+    }
+
+    void OnBecameInvisible()
+    {
+        // Return bullet to pool when it goes off-screen
+        ObjectPool.Release(this);
+    }
+
+    public void ResetBullet()
+    {
+        rb.velocity = transform.up * bulletSpeed;
+    }
+
+    public void Initialize()
+    {
+        if (rb == null)
         {
-            ReturnToPool();
+            rb = GetComponent<Rigidbody2D>();
         }
+        ResetBullet();
     }
 }

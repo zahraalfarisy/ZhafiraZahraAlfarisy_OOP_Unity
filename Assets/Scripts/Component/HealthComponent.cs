@@ -6,7 +6,7 @@ public class HealthComponent : MonoBehaviour
 {
     public int maxHealth = 10;
 
-    private int health;
+    public int health;
 
     void Awake()
     {

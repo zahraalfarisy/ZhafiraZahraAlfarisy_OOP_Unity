@@ -9,14 +9,6 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
-        foreach (Transform child in transform)
-        {
-            if (child.GetComponent<Canvas>() != null || child.GetComponent<UnityEngine.UI.Image>() != null)
-            {
-                child.gameObject.SetActive(false);
-            }
-        }
-        
         if (Instance != null && Instance != this)
         {
             Destroy(this);
@@ -24,9 +16,14 @@ public class GameManager : MonoBehaviour
         }
 
         Instance = this;
+
         LevelManager = GetComponentInChildren<LevelManager>();
+
         DontDestroyOnLoad(gameObject);
-        DontDestroyOnLoad(GameObject.Find("Camera"));
+        var camera = GameObject.Find("Camera");
+        if (camera != null)
+        {
+            DontDestroyOnLoad(camera);
+        }
     }
 }
-

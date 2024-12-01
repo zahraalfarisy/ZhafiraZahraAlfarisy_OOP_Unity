@@ -53,7 +53,7 @@ public class GameStats : MonoBehaviour
     {
         if (playerHealthComponent != null)
         {
-            UpdateHealth(playerHealthComponent.Health);
+            UpdateHealth(playerHealthComponent.health);
         }
     }
 }

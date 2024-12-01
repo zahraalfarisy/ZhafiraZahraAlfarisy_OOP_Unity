@@ -1,19 +1,21 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
+using System.Collections;
 
 public class Weapon : MonoBehaviour
-{
+{   
     [Header("Weapon Stats")]
-    [SerializeField] private float shootIntervalInSeconds = 3f;
+    [SerializeField] public float shootIntervalInSeconds = 3f; // Change to public
+    [SerializeField] private bool isEnemyBossWeapon; // Add this line
 
     [Header("Bullets")]
     public Bullet bullet;
     [SerializeField] private Transform bulletSpawnPoint;
 
+
     [Header("Bullet Pool")]
     private IObjectPool<Bullet> objectPool;
+
 
     private readonly bool collectionCheck = false;
     private readonly int defaultCapacity = 30;
@@ -21,57 +23,78 @@ public class Weapon : MonoBehaviour
     private float timer;
     public Transform parentTransform;
 
-    private void Awake()
+    void Awake(){
+        objectPool = new ObjectPool<Bullet>(
+            CreateBulletItem, 
+            OnGetFromPool, 
+            OnReleaseToPool, 
+            OnDestroyPoolObject, 
+            collectionCheck, 
+            defaultCapacity, 
+            maxSize
+        );
+    }    
+
+    void Start()
     {
-        // Initialize the object pool for bullets
-        objectPool = new ObjectPool<Bullet>(CreateBullet, OnGetFromPool, OnReleaseToPool, OnDestroyPooledObject, collectionCheck, defaultCapacity, maxSize);
+        
     }
 
-    private void FixedUpdate()
+    void Update()
     {
-    // Tambahkan delta waktu ke timer
-    timer += Time.fixedDeltaTime;
-
-    // Cek apakah timer lebih besar atau sama dengan shootIntervalInSeconds
-    if (timer >= shootIntervalInSeconds)
-    {
-        // Panggil fungsi Shoot dan reset timer
-        timer = 0f;
-        Shoot();
-    }
+        timer += Time.deltaTime;
+        float interval =  shootIntervalInSeconds; // Adjust the intervalot
+        if (timer >= interval)
+        {
+            timer = 0f;
+            Bullet bulletInstance = objectPool.Get();
+            // No need to start the coroutine here
+        }
     }
 
-
-    public void Shoot()
+    public void Fire(Vector3 position, Quaternion rotation)
     {
-        Bullet bulletInstance = objectPool.Get();
-        bulletInstance.transform.position = bulletSpawnPoint.position;
-        bulletInstance.transform.rotation = bulletSpawnPoint.rotation;
-        bulletInstance.Initialize(); // Initialize bullet movement
+        float interval =  shootIntervalInSeconds; // Adjust the interval
+        if (timer >= interval)
+        {
+            timer = 0f;
+            Bullet bulletInstance = objectPool.Get();
+            bulletInstance.transform.position = position;
+            bulletInstance.transform.rotation = rotation;
+            bulletInstance.Initialize();
+        }
     }
 
-    private Bullet CreateBullet()
+    Bullet CreateBulletItem()
     {
-        Bullet bulletInstance = Instantiate(bullet, bulletSpawnPoint.position, bulletSpawnPoint.rotation, parentTransform);
-        bulletInstance.SetPool(objectPool); // Set the object pool reference in Bullet
+        Bullet bulletInstance = Instantiate(bullet);
+        bulletInstance.ObjectPool = objectPool; 
         return bulletInstance;
     }
 
-    // Actions when a bullet is taken from the pool
-    private void OnGetFromPool(Bullet bullet)
+    void OnGetFromPool(Bullet bullet)
     {
+        bullet.ObjectPool = objectPool; // Ensure the ObjectPool property is set
         bullet.gameObject.SetActive(true);
+        bullet.transform.position = bulletSpawnPoint.position;
+        bullet.transform.rotation = bulletSpawnPoint.rotation;
+        bullet.Initialize(); 
     }
 
-    // Actions when a bullet is released back to the pool
-    private void OnReleaseToPool(Bullet bullet)
+    void OnReleaseToPool(Bullet bullet)
     {
         bullet.gameObject.SetActive(false);
     }
 
-    // Actions when destroying pooled bullet if the pool is shrinking
-    private void OnDestroyPooledObject(Bullet bullet)
+    void OnDestroyPoolObject(Bullet bullet)
     {
         Destroy(bullet.gameObject);
     }
+
+    // Remove the ReturnBulletToPoolAfterTime coroutine
+    // IEnumerator ReturnBulletToPoolAfterTime(Bullet bullet, float time)
+    // {
+    //     yield return new WaitForSeconds(time);
+    //     objectPool.Release(bullet);
+    // }
 }
